@@ -5,6 +5,7 @@ namespace Pterodactyl\Http\Controllers\Api\Application\Servers;
 use Illuminate\Http\Response;
 use Pterodactyl\Models\Server;
 use Illuminate\Http\JsonResponse;
+use Pterodactyl\Repositories\Wings\DaemonServerRepository;
 use Spatie\QueryBuilder\QueryBuilder;
 use Pterodactyl\Services\Servers\ServerCreationService;
 use Pterodactyl\Services\Servers\ServerDeletionService;
@@ -34,18 +35,25 @@ class ServerController extends ApplicationApiController
     private $repository;
 
     /**
+     * @var \Pterodactyl\Repositories\Wings\DaemonServerRepository
+     */
+    private DaemonServerRepository $daemon;
+
+    /**
      * ServerController constructor.
      */
     public function __construct(
         ServerCreationService $creationService,
         ServerDeletionService $deletionService,
-        ServerRepositoryInterface $repository
+        ServerRepositoryInterface $repository,
+        DaemonServerRepository $daemonServerRepository
     ) {
         parent::__construct();
 
         $this->creationService = $creationService;
         $this->deletionService = $deletionService;
         $this->repository = $repository;
+        $this->daemon = $daemonServerRepository;
     }
 
     /**
@@ -91,6 +99,13 @@ class ServerController extends ApplicationApiController
         return $this->fractal->item($request->getModel(Server::class))
             ->transformWith($this->getTransformer(ServerTransformer::class))
             ->toArray();
+    }
+
+    /**
+     * Wings
+     */
+    public function wingsInfo(GetServerRequest $request): array {
+        return $this->daemon->setServer($request->getModel(Server::class))->getDetails();
     }
 
     /**
