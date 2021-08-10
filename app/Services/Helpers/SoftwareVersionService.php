@@ -88,7 +88,7 @@ class SoftwareVersionService
      */
     public function isLatestPanel()
     {
-        if (config()->get('app.version') === 'canary') {
+        if (config()->get('app.version') === '1.5.1-Zeus') {
             return true;
         }
 
