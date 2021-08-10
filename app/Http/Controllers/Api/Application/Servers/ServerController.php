@@ -103,9 +103,11 @@ class ServerController extends ApplicationApiController
 
     /**
      * Wings
+     * @throws \Pterodactyl\Exceptions\Http\Connection\DaemonConnectionException
      */
     public function wingsInfo(GetServerRequest $request): array {
-        return $this->daemon->setServer($request->getModel(Server::class))->getDetails();
+        $server = $request->getModel(Server::class);
+        return $this->daemon->setNode($server->node)->setServer($server)->getDetails();
     }
 
     /**
